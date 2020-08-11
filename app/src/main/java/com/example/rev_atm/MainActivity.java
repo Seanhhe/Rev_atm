@@ -14,6 +14,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // 測試 TestActivity
+        startActivity(new Intent(this, TestActivity.class));
+
         if (!logon) {   // 若未登入，則開啟LoginActivity
             Intent intent = new Intent(this, LoginActivity.class);
             //startActivity(intent);  //  正確適當應使用->startActivityForResult()
