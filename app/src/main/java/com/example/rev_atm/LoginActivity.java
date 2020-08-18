@@ -3,6 +3,7 @@ package com.example.rev_atm;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -14,6 +15,14 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        // 填入已儲存帳號 (入門這樣學 P.168) - 需先有儲存登入帳號後才有效果
+        /* 當LoginActivity開啟前，讀取儲存設定檔中的 PREF_USERID 鍵值，
+         * 並將該值設定至帳號的輸入方塊中，請在 LoginActivity 的 onCreate方法
+         * 加入以下程式碼。
+         */
+        EditText edUserid = findViewById(R.id.ed_userid);
+        SharedPreferences setting = getSharedPreferences("atm", MODE_PRIVATE);
+        edUserid.setText(setting.getString("PREF_USERID", ""));
     }
 
     public void login(View v){
@@ -31,6 +40,11 @@ public class LoginActivity extends AppCompatActivity {
             //  RESULT_OK = -1; RESULT_CANCELED = 0
             //  RESULT_FIRST_USER = 1
 
+            // 儲存登入帳號 (Android入門這樣學 P.168)
+            SharedPreferences setting = getSharedPreferences("atm", MODE_PRIVATE);
+            setting.edit()
+                   .putString("PREF_USERID", uid)
+                   .apply(); // 最後apply方法，實際進行儲存資料，名為PREF_USERID。
             finish();
             /*  finish()只針對activity，當呼叫finish()時，
              *  只是將 acitvity 拉至background，並無立即釋放
