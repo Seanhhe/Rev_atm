@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<!--    下拉選單 spinner 準備字串陣列資源-->
+<!--    字串陣列可定義在 res/values/ 的任一個XML檔案中，亦可在該資料夾新增資源檔。-->
+<!--    在左側專案下的 res/values 資料夾上按右鍵，選擇 New/Values resource file。-->
+<!--    輸入檔名 array.xml 後按下OK。-->
+<!--    在resources元素內，新增 string-array 元素並定義此陣列名稱為 -->
+<!--    notify_array，並在其中新增 item 元素。-->
+    <string-array name="notify_array">
+        <item>永不</item>
+        <item>只有震動</item>
+        <item>只有提示音</item>
+        <item>震動與提示音</item>
+    </string-array>
+</resources>

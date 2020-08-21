@@ -10,14 +10,84 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     public static final int RC_LOGIN = 1;   // 宣告此常數代表登入功能
     boolean logon = false;
+
+    /* 清單式功能表
+     * 先建立 String[]，把要顯示的清單項目放入。
+     * 在 Activity 中使用 ListView 元件方式與其他元件相同
+     * 先在xml新增、設定邊界、於.java中取得再設定。
+     *
+     */
+    String[] func = {"餘額查詢", "交易明細", "最新消息", "投資理財", "離開"};
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+//        // 程式中取得 ListView (RecycleView 更彈性更好用)
+//        ListView list = findViewById(R.id.list);
+//        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, func);
+//        // 使用 ListView (用 ListView 的 setAdapter 方法)
+//        list.setAdapter(adapter);
+
+        // 下拉選單 - Spinner
+        /* 清單的資料除了在類別中定義之外，比較常用的方式是在專案的
+         * "res/values/" 資料夾下定義字串陣列。
+         * 優點 =>
+         * 方便未來修改資料，不須動到類別，直接改 xml 即可。
+         * 可實作多國語言，可定義不同語系使用的字串陣列。
+         */
+        // 使用 Spinner
+        /* 因為陣列放在 res 中，可使用 ArrayAdapter 的 createFromResource 方法，
+         * 直接產生一個 ArrayAdapter<CharSequence> 物件如下
+         * 參數一：Context，使用 this 即可
+         * 參數二：陣列資源的ID值，使用 R.array.notify_array
+         * 參數三：清單顯示時要使用的版面配置，使用android.R.layout.simple_spinner_item
+         */
+        final Spinner notify = findViewById(R.id.spinner);
+        final ArrayAdapter<CharSequence> nAdapter = ArrayAdapter.createFromResource(
+                this, R.array.notify_array, android.R.layout.simple_spinner_item);
+        nAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // 設定較美觀不擠的版面
+        notify.setAdapter(nAdapter);    // 將nAdapter物件設定入Spinner元件
+        // 選擇項目的事件處理Listener
+        /* 可以為 Spinner 元件加入 AdapterView.OnItemSelectedListener，
+         * 字面意思是"當項目被選擇時的Listener"
+         * 作法：
+         *      Spinner物件的 setOnItemSelectedListener 方法，
+         *      並在方法中 new AdapterView.OnItemSelectedListener(){}
+         */
+        notify.setOnItemSelectedListener(
+                new AdapterView.OnItemSelectedListener() {
+                    // 選擇了項目
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                        Toast.makeText(MainActivity.this, nAdapter.getItem(position).toString(), Toast.LENGTH_LONG).show();
+                        // 用 AdapterView 的 getSelectedItem 方法取得選取項目，回傳值為 Object。
+                        //String text = notify.getSelectedItem().toString();
+                    }
+                    // 未選擇 (清單出現時按下返回時)
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+
+                    }
+                }
+        );
+
+        // --------分隔線--------下方為ch8-4
+
+
+
         // 偏好設定 SharedPreferences
         /*  SharedPreferences 是 Android 的一種介面，可在Activity中
          *  呼叫 getSharedPreferences(String, int) 方法得到物件。
