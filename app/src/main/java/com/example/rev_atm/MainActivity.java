@@ -13,11 +13,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
     public static final int RC_LOGIN = 1;   // 宣告此常數代表登入功能
     boolean logon = false;
 
@@ -41,52 +42,70 @@ public class MainActivity extends AppCompatActivity {
 //        // 使用 ListView (用 ListView 的 setAdapter 方法)
 //        list.setAdapter(adapter);
 
-        // 下拉選單 - Spinner
-        /* 清單的資料除了在類別中定義之外，比較常用的方式是在專案的
-         * "res/values/" 資料夾下定義字串陣列。
-         * 優點 =>
-         * 方便未來修改資料，不須動到類別，直接改 xml 即可。
-         * 可實作多國語言，可定義不同語系使用的字串陣列。
-         */
-        // 使用 Spinner
-        /* 因為陣列放在 res 中，可使用 ArrayAdapter 的 createFromResource 方法，
-         * 直接產生一個 ArrayAdapter<CharSequence> 物件如下
-         * 參數一：Context，使用 this 即可
-         * 參數二：陣列資源的ID值，使用 R.array.notify_array
-         * 參數三：清單顯示時要使用的版面配置，使用android.R.layout.simple_spinner_item
-         */
-        final Spinner notify = findViewById(R.id.spinner);
-        final ArrayAdapter<CharSequence> nAdapter = ArrayAdapter.createFromResource(
-                this, R.array.notify_array, android.R.layout.simple_spinner_item);
-        nAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // 設定較美觀不擠的版面
-        notify.setAdapter(nAdapter);    // 將nAdapter物件設定入Spinner元件
-        // 選擇項目的事件處理Listener
-        /* 可以為 Spinner 元件加入 AdapterView.OnItemSelectedListener，
-         * 字面意思是"當項目被選擇時的Listener"
-         * 作法：
-         *      Spinner物件的 setOnItemSelectedListener 方法，
-         *      並在方法中 new AdapterView.OnItemSelectedListener(){}
-         */
-        notify.setOnItemSelectedListener(
-                new AdapterView.OnItemSelectedListener() {
-                    // 選擇了項目
-                    @Override
-                    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                        Toast.makeText(MainActivity.this, nAdapter.getItem(position).toString(), Toast.LENGTH_LONG).show();
-                        // 用 AdapterView 的 getSelectedItem 方法取得選取項目，回傳值為 Object。
-                        //String text = notify.getSelectedItem().toString();
-                    }
-                    // 未選擇 (清單出現時按下返回時)
-                    @Override
-                    public void onNothingSelected(AdapterView<?> adapterView) {
-
-                    }
-                }
-        );
+        // 下拉選單 - Spinner  (分隔線 ch8-3)
+//        /* 清單的資料除了在類別中定義之外，比較常用的方式是在專案的
+//         * "res/values/" 資料夾下定義字串陣列。
+//         * 優點 =>
+//         * 方便未來修改資料，不須動到類別，直接改 xml 即可。
+//         * 可實作多國語言，可定義不同語系使用的字串陣列。
+//         */
+//        // 使用 Spinner
+//        /* 因為陣列放在 res 中，可使用 ArrayAdapter 的 createFromResource 方法，
+//         * 直接產生一個 ArrayAdapter<CharSequence> 物件如下
+//         * 參數一：Context，使用 this 即可
+//         * 參數二：陣列資源的ID值，使用 R.array.notify_array
+//         * 參數三：清單顯示時要使用的版面配置，使用android.R.layout.simple_spinner_item
+//         */
+//        final Spinner notify = findViewById(R.id.spinner);
+//        final ArrayAdapter<CharSequence> nAdapter = ArrayAdapter.createFromResource(
+//                this, R.array.notify_array, android.R.layout.simple_spinner_item);
+//        nAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // 設定較美觀不擠的版面
+//        notify.setAdapter(nAdapter);    // 將nAdapter物件設定入Spinner元件
+//        // 選擇項目的事件處理Listener
+//        /* 可以為 Spinner 元件加入 AdapterView.OnItemSelectedListener，
+//         * 字面意思是"當項目被選擇時的Listener"
+//         * 作法：
+//         *      Spinner物件的 setOnItemSelectedListener 方法，
+//         *      並在方法中 new AdapterView.OnItemSelectedListener(){}
+//         */
+//        notify.setOnItemSelectedListener(
+//                new AdapterView.OnItemSelectedListener() {
+//                    // 選擇了項目
+//                    @Override
+//                    public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+//                        Toast.makeText(MainActivity.this, nAdapter.getItem(position).toString(), Toast.LENGTH_LONG).show();
+//                        // 用 AdapterView 的 getSelectedItem 方法取得選取項目，回傳值為 Object。
+//                        //String text = notify.getSelectedItem().toString();
+//                    }
+//                    // 未選擇 (清單出現時按下返回時)
+//                    @Override
+//                    public void onNothingSelected(AdapterView<?> adapterView) {
+//
+//                    }
+//                }
+//        );
 
         // --------分隔線--------下方為ch8-4
 
+        // 使用 GridView
+        GridView grid = findViewById(R.id.grid);
+        ArrayAdapter gAdapter =
+                new ArrayAdapter(this, android.R.layout.simple_list_item_1, func);
+        grid.setAdapter(gAdapter);
 
+        // 另外一種事件處理方式 - 在MainActivity實作傾聽者介面 P196
+        /* 此例功能項目被點擊的事件由"OnItemClickListener"，所以用
+         * MainActivity 實作傾聽者介面並實作必要的方法後，就可呼叫
+         * grid 物件的 setOnItemClickListener(this)，傳入本類別即可。
+         * 步驟：
+         * 1) 先為 grid 物件設定 Listener，參數先用 this，並把游標留在括號內。
+         *      grid.setOnItemClickListener(this);
+         * 2) 游標留在括號內，按下 Alt+Enter，選擇第二個實作介面
+         *      Make'MainActivity implements' implement'android.widget.AdapterView.OnItemClickListener'
+         * 3) 自動完成實作介面與必要方法：
+         *      選擇onItemClick(parent:AdapterView<?>, view:View,....
+         */
+        grid.setOnItemClickListener(this);
 
         // 偏好設定 SharedPreferences
         /*  SharedPreferences 是 Android 的一種介面，可在Activity中
@@ -174,5 +193,22 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+        switch (position){
+            case 0:
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                finish();
+                break;
+        }
     }
 }
