@@ -5,18 +5,18 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.GridView;
-import android.widget.ListView;
-import android.widget.Spinner;
-import android.widget.Toast;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
     public static final int RC_LOGIN = 1;   // 宣告此常數代表登入功能
@@ -29,14 +29,44 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      *
      */
     String[] func = {"餘額查詢", "交易明細", "最新消息", "投資理財", "離開"};
-
+    // ch8-5-2 (P201)、ch8-5-4 設計版面配置(layout)檔[]
+    int[] icons = {R.drawable.func_balance,
+            R.drawable.func_history,
+            R.drawable.func_news,
+            R.drawable.func_finance,
+            R.drawable.func_exit};
+    // ch8-5-4 (P202)
+    /* 設計新的版面layout檔，代表在GridView中的單一項目樣貌，
+     * 上方為 ImageView 元件，下方為 TextView 元件。
+     *
+     * 點擊專案中的"app"，再到功能表的 File/New/Android resource file，在對話框中：
+     * 1) 輸入檔名 item_row.xml
+     * 2) Resource type 選"Layout"
+     * 3) Root element 使用"LinearLayout"
+     * 4) 在此新的版面配置.xml上，上方增加一個 ImageView 元件，id為"item_image"，
+     *    下方增加一個 TextView 元件，id為"item_text"
+     */
+    // ch-5-5 (P204) 繼承 BaseAdapter 類別
+    /* 設計一個名稱為 IconAdapter 並繼承 BaseAdapter，在這類別中
+     * 實作父類別的方法，使其能夠以圖示+文字方式顯示主功能畫面的GridView
+     *
+     * 以內部類別設計：
+     *   以內部類別設計 IconAdapter，因為在這類別中會使用到如 Context、icons
+     * 與 func 陣列資料，所以將其設計為 MainActivity 的內部類別可簡化許多
+     * 繁雜的參數傳遞與建構式設計，再者，這個類別也只會在 MainActivity 中
+     * 使用，其他類別並不會用到它。
+     *   在 MainActivity 下的第一層級 (與 onCreate 方法同一級)設計一個
+     * 新類別 IconAdapter，並繼承 BaseAdapter，因為 BaseAdapter 是抽象
+     * 類別，因此必須實作四個方法，請使用 Alt+Enter 自動實作方法如下。
+     */
+    
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        // 程式中取得 ListView (RecycleView 更彈性更好用)
+        // 程式中取得 ListView (RecycleView 更彈性更好用)
 //        ListView list = findViewById(R.id.list);
 //        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, func);
 //        // 使用 ListView (用 ListView 的 setAdapter 方法)
@@ -88,10 +118,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         // --------分隔線--------下方為ch8-4
 
         // 使用 GridView
+//        GridView grid = findViewById(R.id.grid);
+//        ArrayAdapter gAdapter =
+//                new ArrayAdapter(this, android.R.layout.simple_list_item_1, func);
+//        grid.setAdapter(gAdapter);
+        // ch8-5-7 使用 IconAdapter 在GridView呈現
         GridView grid = findViewById(R.id.grid);
-        ArrayAdapter gAdapter =
-                new ArrayAdapter(this, android.R.layout.simple_list_item_1, func);
+        IconAdapter gAdapter = new IconAdapter();
         grid.setAdapter(gAdapter);
+
+        //------分隔線------
 
         // 另外一種事件處理方式 - 在MainActivity實作傾聽者介面 P196
         /* 此例功能項目被點擊的事件由"OnItemClickListener"，所以用
@@ -197,18 +233,76 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-        switch (position){
-            case 0:
+        // ch8-4
+//        switch (position){
+//            case 0:
+//                break;
+//            case 1:
+//                break;
+//            case 2:
+//                break;
+//            case 3:
+//                break;
+//            case 4:
+//                finish();
+//                break;
+//        }
+        // ch8-5-8 功能項目處理事件
+        switch ((int) id) {
+            case R.drawable.func_balance:
                 break;
-            case 1:
+            case R.drawable.func_history:
                 break;
-            case 2:
+            case R.drawable.func_news:
                 break;
-            case 3:
+            case R.drawable.func_finance:
                 break;
-            case 4:
+            case R.drawable.func_exit:
                 finish();
                 break;
+        }
+    }
+
+    // ch8-5-5 (P204) 設計 IconAdapter 繼承 BaseAdapter (功能表/Code/Override Methods)
+    // ch8-5-6 (P205) 實作方法
+    class IconAdapter extends BaseAdapter {
+
+        @Override
+        public int getCount() {
+            return func.length; // 用 func 回傳 GridView 中 item 的數量。
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return func[position]; // 回傳 func[] 內指定位置的item內容
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return icons[position]; // 回傳 position 所對應的id值，此值可供辨識、不重複。
+        }
+
+        @Override   // 回傳處理後的 view 畫面，此處要謹慎處理如不小心會發生很多錯誤
+        public View getView(int position, View convertView, ViewGroup viewGroup) {
+            // 當 GridView 或其他清單元件在畫面中要展示一個 item 給使用者時呼叫此方法。
+            /* 傳入的第二個參數 view 即是目前呼叫手上有的 View 元件。
+             * 在第一次呼叫時，傳入的 view 是 null 值，應在view是null時產生一個合適的
+             * View 元件給呼叫方。
+             *
+             * 此 View 元件應依照傳入的position產生相對應的item，它的版面配置檔
+             * 就是之前設計的 "res/layout/item_rox.xml"，程式碼如下：
+             */
+            View row = convertView; // 把第二個參數引入
+            if (row == null) {
+                // 使用呼叫 Activity的 getLayoutInflater 方法取得 LayoutInflater 物件
+                // ，再使用它的 inflate 方法由版面配置檔 R.layout.item_row.xml 建立一實際 View 物件
+                row = getLayoutInflater().inflate(R.layout.item_row, null);
+                ImageView image = row.findViewById(R.id.item_image); // 引入配置
+                TextView text = row.findViewById(R.id.item_text); // 引入配置
+                image.setImageResource(icons[position]); // setImageResource方法設定圖示的圖檔資源
+                text.setText(func[position]); // setText方法設定圖示上的文字
+            }
+            return row;
         }
     }
 }
