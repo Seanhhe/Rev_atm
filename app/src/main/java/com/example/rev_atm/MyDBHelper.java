@@ -50,7 +50,7 @@ public class MyDBHelper extends SQLiteOpenHelper {
          * 在 onCreate 方法中，使用該方法的db物件(SQLiteDatabase)中的
          * execSQL 方法建立資料表 exp 表格如下：
          */
-        db.execSQL("CREATE TABLE exp (_id INTEGER PRIMARY KEY NOT NULL, cdate DATETIME NOT NULL, INFO VARCHAR(20), amount INTEGER)");
+        db.execSQL("CREATE TABLE exp (_id INTEGER PRIMARY KEY NOT NULL, cdate DATETIME NOT NULL, info VARCHAR(20), amount INTEGER)");
         // 完成 MyDBHelper 類別設計後，至 AddActivity，準備設計新增消費紀錄功能
     }
 
