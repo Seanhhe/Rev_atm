@@ -34,7 +34,7 @@ public class AddActivity extends AppCompatActivity {
         CursorFactory factory > 在此用null，代表以標準模式SQLiteCursor處理Cursor。
         int version > 此應用程式目前的資料庫版本，在此用數字1代表第一版。
          */
-        helper = new MyDBHelper(this, "expense.sqlite", null, 1);
+        helper = new MyDBHelper(this, "expense.db", null, 1);
     }
 
     // 按鈕功能：新增
