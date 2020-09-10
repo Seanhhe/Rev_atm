@@ -41,7 +41,7 @@ public class FinanceActivity extends AppCompatActivity {
 
         // ch9-6-2 更換 SimpleCursorAdapter 建構程式碼 (P239)
         /* 回到FinanceActivity的 onCreate 方法中，將上頭原本使用兩欄位的程式碼
-           更改如下：
+           更改如下
            若未來有其他字型、顏色、間距等設計需求，直接修改 finance_row.xml 即可得到效果。
          */
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
