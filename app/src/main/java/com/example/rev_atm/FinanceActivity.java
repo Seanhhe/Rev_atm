@@ -22,7 +22,11 @@ public class FinanceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_finance);
         // ch9-6-1 使用 simpleCursorAdapter (P232)
         ListView list = findViewById(R.id.list); // 先取得 FinanceActivity 中的 ListView (id為 list)
-        MyDBHelper helper = new MyDBHelper(this, "expense.db", null, 1); // 產生設計的MyDBHelper物件，並查詢exp表格
+//      MyDBHelper helper = new MyDBHelper(this, "expense.db", null, 1); // 產生設計的MyDBHelper物件，並查詢exp表格
+
+        // ch 9-6-3 SQLiteOpenHelper 改為 Singleton 設計 (P241)
+        MyDBHelper helper = MyDBHelper.getInstance(this);
+
         Cursor c = helper.getReadableDatabase().query("exp", null, null, null, null, null, null);
         /*
          先呼叫 MyDBHelper 建構式得到物件再查詢，最後得到 Cursor 物件。

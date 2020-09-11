@@ -1,5 +1,6 @@
 package com.example.rev_atm;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -24,11 +25,37 @@ import androidx.annotation.Nullable;
  *
  */
 public class MyDBHelper extends SQLiteOpenHelper {
+    /* ch 9-6-3 SQLiteOpenHelper 的 Singleton 設計 (P240)
+    雖然在不同的 Activity 中都產生 MyDBHelper 物件，雖執行正常，但當
+    專案需求複雜時，很可能同一時間存取到同一個 SQLiteOpenHelper 物件時
+    會出現資料庫被鎖住的問題。因此，較簡單的方式是將 MyDBHelper 設計成
+    單一物件，利用 static 的特性，確保在整個 App 中都使用同一個 MyDBHelper
+    物件，也就是設計模式的 Singleton 模式。
+        在 MyDBHelper 類別中新增一個封閉的 static 類別變數 (寫在public前面才不會紅字)
+    再設計一個公開的 getInstance() 方法，已取得 MyDBHelper 物件，最後再
+    將原本的建構式修飾字從 public 改為 private，程式碼如下：
+        完成後，再到 FinanceActivity 與 AddActivity 將原來產生的
+    MyDBHelper 物件程式碼由：
+    MyDBHelper helper = new MyDBHelper(this, "expense.db", null, 1);
+    改為：
+    MyDBHelper helper = MyDBHelper.getInstance(this);
+        經過Singleton後的 MyDBHelper 與 Activity 類別，能夠確保同一時間
+    只有一個 MyDBHelper 實例在運行，可避免執行緒存取資料庫問題。
+     */
+    private static MyDBHelper instance; // (寫在public MyDBHelper前面才不會紅字，instance是變數)
+    public static MyDBHelper getInstance(Context ctx){
+        if (instance == null) {
+            instance = new MyDBHelper(ctx, "expense.db", null, 1);
+        }
+        return instance;
+    }
+
     // 建構 helper 物件以創立、開啟，或管理資料庫。
     // 資料庫只在接收 getWritableDatabase() 或 getReadableDatabase()
     // 指令才會實際執行創立或開啟DB。
-    public MyDBHelper(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
-        super(context, name, factory, version);
+    private MyDBHelper(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
+        super(context, name, factory, version); // 原始修飾字為 public
+
     }
 
     @Override
