@@ -7,12 +7,16 @@ import android.os.Bundle;
 import android.util.Log;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -54,7 +58,7 @@ public class TransActivity extends AppCompatActivity {
                 /* 解析JSON
                  * 執行自行定義的 parseJSON方法，傳入連線後伺服器的回應資料
                  */
-                // parseJSON(json);
+                parseJSON(json);
             }
 
             @Override
@@ -96,9 +100,30 @@ public class TransActivity extends AppCompatActivity {
             Log.d("JSON", s);
             parseJSON(s);
         }
-
-        // 為了解析JSON資料而自行設計的方法
-        private void parseJSON(String s) {
+    }
+    // 為了解析JSON資料而自行設計的方法
+    /* ch 11-3-2 使用JSON.org解析 (P.291)
+     * 基於回傳的字串，以JSONArray建立物件 array，再使用迴圈取出陣列中
+     * 的JSON物件(使用JSONObject類別)，再利用JSONObject提供的方法取出
+     * 每一筆交易內的四項資料，依這四項資料產生Java 的 Transaction物件
+     * ，再將物件加入到 ArrayList 集合物件 trans 中。
+     */
+    private void parseJSON(String s) {
+        ArrayList<Transaction> trans = new ArrayList(); // 準備ArrayList物件 trans，裡頭只能放Transaction物件
+        try {
+            JSONArray array = new JSONArray(s); // 將傳入的字串s 交給JSONArray的建構式，產生array物件
+            for (int i = 0; i < array.length(); i++) {  // 以迴圈依序取出交易紀錄
+                JSONObject obj = array.getJSONObject(i);  // 以索引值取得JSONObject物件 obj
+                String account = obj.getString("account"); // 呼叫JSONObject類的getXXX方法取得各個屬性值
+                String date = obj.getString("date");
+                int amount = obj.getInt("amount");
+                int type = obj.getInt("type");
+                Log.d("JSON : ", account + "/" + date + "/" + amount + "/" + type);
+                Transaction t = new Transaction(account, date, amount, type); // 產生 Transaction 物件，代表一筆交易紀錄
+                trans.add(t); // 將t物件加入到集合物件中
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 }
