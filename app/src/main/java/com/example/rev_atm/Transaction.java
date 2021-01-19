@@ -25,7 +25,7 @@ public class Transaction {
     public Transaction() {
     }
 
-    // 四參數建構式 (alt+insert 選單操作)
+    // 四參數建構式 (alt+insert 選單操作)(功能表Code\Generate)
     public Transaction(String account, String date, int amount, int type) {
         this.account = account;
         this.date = date;
@@ -35,7 +35,7 @@ public class Transaction {
 
     /* 建立 getter/setter 方法
      * (alt+insert選單操作)
-     *
+     * (功能表Code\Generate)
      */
 
     public String getAccount() {

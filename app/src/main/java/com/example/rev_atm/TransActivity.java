@@ -6,6 +6,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,7 +41,6 @@ public class TransActivity extends AppCompatActivity {
          * 如網址則使用url()方法定義，完成後再呼叫build方法即產生
          * HTTP的請求(Request)，此時還未連線至主機。
          */
-        //
         Request request = new Request.Builder()
                 .url("https://atm201605.appspot.com/h")
                 .build();
@@ -58,7 +60,11 @@ public class TransActivity extends AppCompatActivity {
                 /* 解析JSON
                  * 執行自行定義的 parseJSON方法，傳入連線後伺服器的回應資料
                  */
-                parseJSON(json);
+//                parseJSON(json);
+                /* 解析 Gson
+                 * 須暫時把 parseJSON(json) 註解掉
+                 */
+                parseGson(json);
             }
 
             @Override
@@ -98,9 +104,11 @@ public class TransActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             Log.d("JSON", s);
-            parseJSON(s);
+            //parseJSON(s);
+            parseGson(s);
         }
     }
+
     // 為了解析JSON資料而自行設計的方法
     /* ch 11-3-2 使用JSON.org解析 (P.291)
      * 基於回傳的字串，以JSONArray建立物件 array，再使用迴圈取出陣列中
@@ -125,5 +133,36 @@ public class TransActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    /* ch 11-3-3 使用GSON第三方函式庫(P.293)
+     * 除了Android內建的JSON.org函式庫外，仍有許多在處理JSON格式
+     * 資料時更有效率的函式庫，例如GSON，GSON是由Google所提供處理
+     * JSON格式的函式庫，並未內建在Android中。
+     * (https://github.com/google/gson)
+     *
+     * 請打開專案中的 build.gradle(Module:app)，在最下方的
+     * dependencies 區塊中加入Gson函式庫名稱與版本。完成後按
+     * 上方功能圖示的 Sync Project with Gradle Files 取得並
+     * 更新函式庫。 // https://gitlab.com/pie9/Atm/tree/56399dd
+     */
+    private void parseGson(String s) {
+        Gson gson = new Gson();
+        /* 下行呼叫Gson類別的fromJson方法，代表要從JSON格式資料轉換
+         * 為Java資料。
+         * 第一個參數是JSON字串。
+         * 第二個參數是提供給Gson類別我們想要轉出的資料格式，
+         * 資料型態使用Gson的 TypeToken 類別宣告目的型態為
+         * ArrayList<Transaction>，Gson類別會試著將JSON資料一次就
+         * 轉換為 Java 的集合類別，最後以 list 物件儲存。
+         * Log.d 列印出陣列內元素的筆數與第一筆資料的交易金額，用以確認。
+         *
+         * 執行前須將 onCreate 方法中的 OkHttp 回報方法 onResponse 中
+         * 的 parseJSON 該行註解，改用 parseGson 方法。
+         */
+        ArrayList<Transaction> list =
+                gson.fromJson(s,
+                        new TypeToken<ArrayList<Transaction>>(){}.getType());
+        Log.d("GSON", list.size() + "/" + list.get(0).getAmount());
     }
 }
