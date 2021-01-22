@@ -6,6 +6,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -64,7 +67,11 @@ public class TransActivity extends AppCompatActivity {
                 /* 解析 Gson
                  * 須暫時把 parseJSON(json) 註解掉
                  */
-                parseGson(json);
+//                parseGson(json);
+                /* 解析 Jackson
+                 * 暫時把 parseGson(json) 註解掉
+                 */
+                parseJackson(json);
             }
 
             @Override
@@ -164,5 +171,38 @@ public class TransActivity extends AppCompatActivity {
                 gson.fromJson(s,
                         new TypeToken<ArrayList<Transaction>>(){}.getType());
         Log.d("GSON", list.size() + "/" + list.get(0).getAmount());
+    }
+
+    /* ch 11-3-4 使用 Jackson 第三方函式庫
+     * [FasterXML Jackson] (簡稱Jackson) 是目前開放源碼專案中有著
+     * 高效率特色的函式庫之一，常使用再許多應用程式，官網如下：
+     * https://github.com/FasterXML/jackson
+     * (https://github.com/FasterXML/jackson-databind)
+     *
+     * 解析 JSON 資料時，需要導入兩項Jackson函式庫，請打開專案中的
+     * build.gradle(Module:app)，在最下方的dependencies區塊中加入
+     * Jackson的函式庫名稱與版本如下：
+     *
+     * implementation group: 'com.fasterxml.jackson.core',
+     *      name: 'jackson-databind', version: '2.12.0'
+     */
+    private void parseJackson(String s) {
+        // 產生Jackson函式庫負責解析的 ObjectMapper 類別
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            // 呼叫 ObjectMapper 的 readValue 方法進行JSON格式轉換為Java資料的工作，第一個參數為JSON字串s
+            ArrayList<Transaction> list =
+                    objectMapper.readValue(s,
+            // 使用 Jackson 的 TypeReference 宣告目的型態為
+            // ArrayList<Transaction>，ObjectMapper會試著將JSON資料
+            // 一次就轉換為Java的集合類別，最後以 list 物件儲存。
+                            new TypeReference<ArrayList<Transaction>>() {});
+            // 除錯訊息
+            Log.d("JACKSON : ", list.size() + "/" + list.get(0).getAmount());
+            // 執行前先將 onCreate 方法中的 OkHttp 回報方法 onResponse 中
+            // 的 parseGson 該行註解，改用parseJackson 方法處理。
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 }
