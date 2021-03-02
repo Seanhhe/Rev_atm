@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      * 4) 在此新的版面配置.xml上，上方增加一個 ImageView 元件，id為"item_image"，
      *    下方增加一個 TextView 元件，id為"item_text"
      */
-    // ch-5-5 (P204) 繼承 BaseAdapter 類別
+    // ch8-5-5 (P204) 繼承 BaseAdapter 類別
     /* 設計一個名稱為 IconAdapter 並繼承 BaseAdapter，在這類別中
      * 實作父類別的方法，使其能夠以圖示+文字方式顯示主功能畫面的GridView
      *
@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //        ArrayAdapter gAdapter =
 //                new ArrayAdapter(this, android.R.layout.simple_list_item_1, func);
 //        grid.setAdapter(gAdapter);
-        // ch8-5-7 使用 IconAdapter 在GridView呈現
+        // ch8-5-7 使用 IconAdapter 在GridView呈現 (P.206)
         GridView grid = findViewById(R.id.grid);
         IconAdapter gAdapter = new IconAdapter();
         grid.setAdapter(gAdapter);

@@ -1,6 +1,8 @@
 package com.example.rev_atm;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -23,6 +25,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -191,7 +194,7 @@ public class TransActivity extends AppCompatActivity {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             // 呼叫 ObjectMapper 的 readValue 方法進行JSON格式轉換為Java資料的工作，第一個參數為JSON字串s
-            ArrayList<Transaction> list =
+            final ArrayList<Transaction> list =
                     objectMapper.readValue(s,
             // 使用 Jackson 的 TypeReference 宣告目的型態為
             // ArrayList<Transaction>，ObjectMapper會試著將JSON資料
@@ -201,8 +204,31 @@ public class TransActivity extends AppCompatActivity {
             Log.d("JACKSON : ", list.size() + "/" + list.get(0).getAmount());
             // 執行前先將 onCreate 方法中的 OkHttp 回報方法 onResponse 中
             // 的 parseGson 該行註解，改用parseJackson 方法處理。
+
+            /** (Page.306)
+             *  在 TransAcivity 中取得網路資料並解析轉換完成交易集合的程式碼後，
+             *  呼叫 setupRecyclerView 方法，並傳入集合物件，例如 CH 11-4-2的
+             *  parseJackson 方法內，程式碼如紅框處
+             */
+
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
     }
+
+    /* 使用 Adapter (承接 TransactionAdapter 設計後，Page.306)
+     * 自行設計一個新方法 setupRecyclerView，
+     * 傳入參數為 List<Transaction>，如下：
+     */
+    private void setupRecyclerView(List<Transaction> list) {
+        RecyclerView recyclerView = findViewById(R.id.recycler); // 取得 activity_trans.xml 畫面中的 RecyclerView 元件
+        TransactionAdapter adapter = new TransactionAdapter(list); // 傳入交易集合 list 物件並產生 TransactionAdapter 物件。
+        recyclerView.setAdapter(adapter); // 為 RecyclerView 設定 Adapter
+        recyclerView.setLayoutManager(new LinearLayoutManager(this)); // 設定 RecyclerView 自己的 LinearLayoutManager 物件。
+    }
+
+    /* 在 TransActivity 中取得網路資料並解析轉換完成交易集合的code後，
+     * 呼叫 setupRecyclerView 方法，並傳入集合物件，例如 CH 11-4-2
+     * 的 parseJackson 方法內，程式碼如 Page.306 下方紅框處。
+     */
 }
