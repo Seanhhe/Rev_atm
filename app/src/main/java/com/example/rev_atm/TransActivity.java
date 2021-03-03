@@ -209,8 +209,23 @@ public class TransActivity extends AppCompatActivity {
              *  在 TransAcivity 中取得網路資料並解析轉換完成交易集合的程式碼後，
              *  呼叫 setupRecyclerView 方法，並傳入集合物件，例如 CH 11-4-2的
              *  parseJackson 方法內，程式碼如紅框處
+             *
+             *  (Page.307)
+             *  因為本例使用 OkHttp 函式庫取得網址回應，再呼叫 parseJackson 方法，
+             *  因此，此處執行時仍是處於背景執行緒(background thread)，並不是
+             *  UI 執行緒，無法直接呼叫我們所設計的 setupRecyclerView 方法，
+             *  因為在該方法中會存取到畫面的元件 recycler。
+             *
+             *  使用 Activity 的方法 runOnUiThread(Runnable) 可指定
+             *  Runnable 介面中的程式碼在 UI 執行緒中執行，因此將
+             *  setupRecyclerView 的呼叫寫在 Runnable 介面的 run 方法內。
              */
-
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    setupRecyclerView(list);
+                }
+            });
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
